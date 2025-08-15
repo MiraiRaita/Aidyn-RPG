@@ -40,22 +40,32 @@ class Player{
                 health = maxHealth;
             }
         }
+        
+        enum Stat {
+            STRENGTH,
+            CHARISMA,
+            INTELLIGENCE,
+            DEXTERITY
+        };
+
         //Shows Health
         int getHealth(){
             return health; 
         }
-        int getStrength(){
-            return strength; 
+        int getStatValue(Stat stat) {
+        switch (stat) {
+            case STRENGTH:
+                return strength;
+            case CHARISMA:
+                return charisma;
+            case INTELLIGENCE:
+                return intelligence;
+            case DEXTERITY:
+                return dexterity;
+            default:
+                return 0;  // Should never happen
         }
-        int getCharisma(){
-            return charisma; 
-        }
-        int getIntelligence(){
-            return intelligence; 
-        }
-        int getDexterity(){
-            return dexterity;
-        }
+    }
         int getCredits(){
             return credits; 
         }
@@ -75,12 +85,6 @@ class Player{
          if (amount > 0) credits += amount;
         }
         
-        enum Stat {
-            STRENGTH,
-            CHARISMA,
-            INTELLIGENCE,
-            DEXTERITY
-        };
 
         bool increaseStats(Stat statToIncrease, int points){
             if (points <= 0) return false;
@@ -120,6 +124,50 @@ class Player{
             }
         }
 
+        bool increaseStrength(int points){
+            if(points > 0 && strength + points <= 20){
+                strength += points;
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+
+        bool increaseCharisma(int points){
+            if(points > 0 && charisma + points <= 20){
+                charisma += points;
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+
+        bool increaseIntelligence(int points){
+            if(points > 0 && intelligence + points <= 20){
+                intelligence += points;
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+
+        bool increaseDexterity(int points){
+            if(points > 0 && dexterity + points <= 20){
+                dexterity += points;
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+
+        bool isAlive(){
+            return health > 0;
+        }
+
         void displayStatus(){
             std::cout<< "~~~~" << name << "~~~~"<< std::endl;
             std::cout << "Health: " << health << "/100" << std::endl;
@@ -131,4 +179,68 @@ class Player{
         }
 
 };
+
+void allocateInitialCredits(Player& player){
+    std::cout << "\n=== CHARACTER CREATION ===" << std::endl;
+    std::cout << "You have " << player.getCredits() << " credits to spend on stats." << std::endl;
+    std::cout << "Each stat point costs 3 credits." << std::endl;
+
+    bool allocating = true;
+    while(allocating && player.getCredits() >= 3){
+        player.displayStatus();
+        std::cout << "\nWhich stat to increase?" << std::endl;
+        std::cout << "1. Strength  2. Charisma  3. Intelligence  4. Dexterity  5. Done" << std::endl;
+
+        int choice;
+        std::cin >> choice;
+        while (std::cin.fail()) {
+            std::cout << "Invalid input. Please enter a number." << std::endl;
+            std::cin.clear(); // Clear the error flag
+            std::cin.ignore(256, '\n'); // Discard the bad input
+            std::cin >> choice; // Try again
+        }
+        
+        if (choice >= 1 && choice <= 4) {
+            if (player.spendCredits(3)) {
+                Player::Stat stat = static_cast<Player::Stat>(choice - 1);
+                if (player.increaseStats(stat, 1)) {
+                    std::cout << "Stat increased!" << std::endl;
+                } else {
+                    std::cout << "Stat at maximum! Refunding credits." << std::endl;
+                    player.earnCredits(3);
+                }
+            }
+        } else if (choice == 5) {
+            allocating = false;
+        }
+    }
+}
+   
+enum DifficultyLevel {
+    TRIVIAL = 5,
+    EASY = 8,
+    MODERATE = 12,
+    HARD = 15,
+    VERY_HARD = 18,
+    NEARLY_IMPOSSIBLE = 25
+}; 
+
+bool skillCheck(Player& player,Player::Stat stat, DifficultyLevel difficulty){
+    int roll = rand()% 20 + 1;
+    int statValue = player.getStatValue(stat);
+    return (roll + statValue) >= difficulty;
+}   
+
+bool trainStat(Player& player, std::string statName, int cost = 5) {
+    if (!player.spendCredits(cost)) return false;
+    
+    if (statName == "strength") return player.increaseStrength(1);
+    else if (statName == "charisma") return player.increaseCharisma(1);
+    else if (statName == "intelligence") return player.increaseIntelligence(1);
+    else if (statName == "dexterity") return player.increaseDexterity(1);
+    
+    return false;  // Invalid stat name
+}
+
+
 
