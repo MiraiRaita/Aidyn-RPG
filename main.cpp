@@ -20,7 +20,7 @@ class Player{
         void setName(std::string playerName){
             name = playerName;
         }
-
+        //Shows Name
         std::string getName(){
             return name;
         }
@@ -39,5 +39,46 @@ class Player{
                 health = maxHealth;
             }
         }
+        //Shows Health
+        int getHealth(){
+            return health; 
+        }
+
+        int getStrength(){
+            return strength; 
+        }
+
+        bool spendCredits(int amount){
+            if (credits > amount && amount > 0){
+                credits -= amount;
+                return true;
+            }
+            else{
+                return false;
+            }
+
+        }
+
+        bool increaseStrength(int points){
+            if(points > 0 && strength + points <= 20){
+                strength += points;
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+
+
 };
 
+int main(){
+    Player player;
+    std::string playerName;
+    std::cout << "Hi fellow player... What's your name. \n";
+    std::cout << "Enter a name:";
+    getline(std::cin, playerName);
+    std::cout << "Welcome, " << playerName << "!" << std::endl;
+    
+
+}
