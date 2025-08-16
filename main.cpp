@@ -9,11 +9,11 @@ class Player{
 
     private:
         int health = 100;
-        int strength = 7;
-        int charisma = 7;
+        int strength = 12;
+        int charisma = 4;
         int intelligence = 7;
-        int dexterity = 7;
-        int credits = 30;
+        int dexterity = 11;
+        int skillPoints = 30;
         std::string name;
 
     
@@ -66,13 +66,13 @@ class Player{
                 return 0;  // Should never happen
         }
     }
-        int getCredits(){
-            return credits; 
+        int getskillPoints(){
+            return skillPoints; 
         }
 
-        bool spendCredits(int amount){
-            if (credits >= amount && amount > 0){
-                credits -= amount;
+        bool spendskillPoints(int amount){
+            if (skillPoints >= amount && amount > 0){
+                skillPoints -= amount;
                 return true;
             }
             else{
@@ -81,8 +81,8 @@ class Player{
 
         }
         
-        void earnCredits(int amount){
-         if (amount > 0) credits += amount;
+        void earnskillPoints(int amount){
+         if (amount > 0) skillPoints += amount;
         }
         
 
@@ -175,18 +175,19 @@ class Player{
             std::cout << "Charisma: " << charisma << std::endl;
             std::cout << "Intelligence: " << intelligence << std::endl;
             std::cout << "Dexterity: " << dexterity << std::endl;
-            std::cout << "Credits: " << credits << std::endl;
+            std::cout << "skillPoints: " << skillPoints << std::endl;
         }
 
 };
 
-void allocateInitialCredits(Player& player){
+//skillPoints Allocation System
+void allocateInitialskillPoints(Player& player){
     std::cout << "\n=== CHARACTER CREATION ===" << std::endl;
-    std::cout << "You have " << player.getCredits() << " credits to spend on stats." << std::endl;
-    std::cout << "Each stat point costs 3 credits." << std::endl;
+    std::cout << "You have " << player.getskillPoints() << " skillPoints to spend on stats." << std::endl;
+    std::cout << "Each stat point costs 3 skillPoints." << std::endl;
 
     bool allocating = true;
-    while(allocating && player.getCredits() >= 3){
+    while(allocating && player.getskillPoints() >= 3){
         player.displayStatus();
         std::cout << "\nWhich stat to increase?" << std::endl;
         std::cout << "1. Strength  2. Charisma  3. Intelligence  4. Dexterity  5. Done" << std::endl;
@@ -201,13 +202,13 @@ void allocateInitialCredits(Player& player){
         }
         
         if (choice >= 1 && choice <= 4) {
-            if (player.spendCredits(3)) {
+            if (player.spendskillPoints(3)) {
                 Player::Stat stat = static_cast<Player::Stat>(choice - 1);
                 if (player.increaseStats(stat, 1)) {
                     std::cout << "Stat increased!" << std::endl;
                 } else {
-                    std::cout << "Stat at maximum! Refunding credits." << std::endl;
-                    player.earnCredits(3);
+                    std::cout << "Stat at maximum! Refunding skillPoints." << std::endl;
+                    player.earnskillPoints(3);
                 }
             }
         } else if (choice == 5) {
@@ -215,7 +216,21 @@ void allocateInitialCredits(Player& player){
         }
     }
 }
-   
+
+//CreateCharacter
+void createCharacter(Player& player){
+    std::cin.ignore();
+    std::string name;
+    std::cout<< "What's your name?";
+    getline(std::cin, name);
+    player.setName(name);
+
+    allocateInitialskillPoints(player);    
+    std::cout<< "Welcome," << name << "!" <<std::endl;
+    player.displayStatus();
+}
+
+//Difficulties
 enum DifficultyLevel {
     TRIVIAL = 5,
     EASY = 8,
@@ -224,15 +239,15 @@ enum DifficultyLevel {
     VERY_HARD = 18,
     NEARLY_IMPOSSIBLE = 25
 }; 
-
+//D20
 bool skillCheck(Player& player,Player::Stat stat, DifficultyLevel difficulty){
     int roll = rand()% 20 + 1;
     int statValue = player.getStatValue(stat);
     return (roll + statValue) >= difficulty;
 }   
-
+//StatsTraining
 bool trainStat(Player& player, std::string statName, int cost = 5) {
-    if (!player.spendCredits(cost)) return false;
+    if (!player.spendskillPoints(cost)) return false;
     
     if (statName == "strength") return player.increaseStrength(1);
     else if (statName == "charisma") return player.increaseCharisma(1);
