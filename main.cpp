@@ -257,5 +257,14 @@ bool trainStat(Player& player, std::string statName, int cost = 5) {
     return false;  // Invalid stat name
 }
 
+bool villageSquareCombat (Player& player, bool hasBackup, bool surprise ){
+    std::cout << "~~~~~~~~Village Fight Scene~~~~~~~~"<< std::endl;
+    std::cout << "In the middle of the village square stood four armoured men: one on foot, the others mounted on horses. /nThe man standing on the ground held a spear in his right hand. /nIn front of the four men was the weak, old figure of Kilian lying on the floor."<<std::endl;
 
+    if(surprise){
+        std::cout<< "Your axe went flying towards his head, embedding itself deep in his skull." << std::endl;
+        std::cout<< "The spearman went down! Three horsemen remain... "<< std::endl;
+    }
+
+};
 
