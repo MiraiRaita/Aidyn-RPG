@@ -15,7 +15,8 @@ class Player{
         int dexterity = 11;
         int skillPoints = 15;
         std::string name;
-
+        int currentChapter = 1;
+        bool chapterOneCompleted = false;
     
     public:
         void setName(std::string playerName){
@@ -69,6 +70,22 @@ class Player{
         int getskillPoints(){
             return skillPoints; 
         }
+
+        int getCurrentChapter(){
+            return currentChapter;
+        }
+        void setCurrentChapter(int chapter){
+            currentChapter = chapter;
+        }
+
+        bool isChapterOneCompleted(){
+            return chapterOneCompleted;
+        }
+
+        void setChapterOneCompleted(bool completed){
+            chapterOneCompleted = completed;
+        }
+
 
         bool spendskillPoints(int amount){
             if (skillPoints >= amount && amount > 0){
@@ -172,6 +189,43 @@ class Player{
             std::cout << "Intelligence: " << intelligence << std::endl;
             std::cout << "Dexterity: " << dexterity << std::endl;
             std::cout << "skillPoints: " << skillPoints << std::endl;
+        }
+
+        bool saveToFile (const std::string& filename){
+            std::ofstream file(filename);
+            if(!file.is_open()){
+                return false;
+            }
+
+            file << name << std::endl;
+            file << health << std::endl;
+            file << strength << std::endl;
+            file << charisma << std::endl;
+            file << intelligence << std::endl;
+            file << dexterity << std::endl;
+            file << skillPoints << std::endl;
+            file << currentChapter << std::endl;
+            file << chapterOneCompleted << std::endl;
+            file.close();
+            return true;
+        }
+
+        bool loadFromFile (const std::string& filename){
+            std::ifstream file(filename);
+            if(!file.is_open()){
+                return false;
+            }
+            std::getline(file, name);
+            file >> health;
+            file >> strength;
+            file >> charisma;
+            file >> intelligence;
+            file >> dexterity;
+            file >> skillPoints;
+            file >> currentChapter;
+            file >> chapterOneCompleted;
+            file.close();
+            return true;
         }
 
 };
@@ -369,8 +423,7 @@ bool chapterOne (Player& player){
     std::cout << "1. Grab your axe and rush to help" << std::endl;
     std::cout << "2. Talk to the villagers and convince them to help" << std::endl;
     std::cout << "3. Unleash a sneak attack on them" << std::endl;
-    pressEnterToContinue();
-    std::cout << "\nChoice:" <<std::endl;
+    std::cout << "Choice:" <<std::endl;
 
     int choice;
     std::cin >> choice;
@@ -456,7 +509,7 @@ bool chapterTwo (Player& player){
     pressEnterToContinue();
     std::cout<< "You sighed and started pouring the piping-hot stew onto two wooden bowls. You passed the bowl with two pieces of bread to your father. Kilian was sitting near the window, wrapped in a tattered green blanket looking at the moon. After going through such traumatic events, Kilian's body had completely broken down. Now he sat quietly, feverish, gazing at the moonlit night sky."<< std::endl;
     pressEnterToContinue();
-    std::cout<< "He slowly turned toward" << player.getName()<< "and reached his arms out to grab the bowl of stew and bread. 'Phew… phew…' Kilian blew on the hot stew to cool it down as he drenched the bread in the stew. He closed his eyes and bit the soggy bread." << std::endl;
+    std::cout<< "He slowly turned toward " << player.getName()<< "and reached his arms out to grab the bowl of stew and bread. 'Phew… phew…' Kilian blew on the hot stew to cool it down as he drenched the bread in the stew. He closed his eyes and bit the soggy bread." << std::endl;
     pressEnterToContinue();
     std::cout<< "The moment of silence was broken by a knock on the door" << std::endl;
     std::cout<< "You got up and opened the door and saw Douglas and Collins at the doorstep, followed by what seemed the whole village. You hesitantly welcome them in." << std::endl;
@@ -497,7 +550,7 @@ bool chapterTwo (Player& player){
 void runMainStory(Player& player){
     std::cout<< "For eternity, when evil arises, a saviour, a messiah arises to eradicate the evil. \nBut, in these dark ages, even the morally upright fear the wrath of the wicked." <<std::endl;
     pressEnterToContinue();
-    std::cout<< "\nThe people of the Kingdom of Adonia pray to the gods for a hero, a saviour to save them from the tyranny of the Devil Emperor Adonis III.\nHe ruled with an iron fist, tolerating no criticism. The man — if you can call him one — waged a series of wars with his neighbouring kingdoms, leading to a ten-year-long war, which resulted in an Adonian victory. " << std::endl;
+    std::cout<< "\nThe people of the Kingdom of Adonia pray to the gods for a hero, a saviour to save them from the tyranny of the Devil Emperor Adonis III.\nHe ruled with an iron fist, tolerating no criticism. The man -- if you can call him one -- waged a series of wars with his neighbouring kingdoms, leading to a ten-year-long war, which resulted in an Adonian victory. " << std::endl;
     pressEnterToContinue();
     std::cout<< "Following the gruelling war, he raised taxes to replenish his depleted treasury. \nHe established a system of landlords, who were tasked with supervising up to seven villages and collecting taxes from them." << std::endl;
     pressEnterToContinue();
@@ -513,9 +566,7 @@ void runMainStory(Player& player){
         chapterTwo(player);
     }
 }
-void startNewGame(){
-    Player player;
-
+void startNewGame(Player& player){
     createCharacter(player);
 
     runMainStory(player);
@@ -529,9 +580,93 @@ void showMainMenu(){
     std::cout << "Choice:" << std::endl;
 }
 
+void saveGame(Player& player){
+    std::cout << "Enter save filename (without extension)" << std::endl;
+    std::string filename;
+    std::cin.ignore();
+    std::cin >> filename;
+    filename += ".sav";
+
+    if(player.saveToFile(filename)){
+        std::cout << "~Progress Saved Successfully~" <<std::endl;
+    }
+    else{
+        std::cout << "Error: Progress could not be saved..." << std::endl;
+    }
+    std::cin.ignore();
+}
+
+void loadGame(Player& player){
+    std::cout << "Enter save filename (without extension)" << std::endl;
+    std::string filename;
+    std::cin.ignore();
+    std::cin >> filename;
+    filename += ".sav";
+
+    if(player.loadFromFile(filename)){
+        std::cout << " Game loaded successfully from " << filename << "!" << std::endl;
+        player.displayStatus();
+    
+        if(player.getCurrentChapter() == 1){
+            std::cout<< "Resuming Chapter 1..." <<std::endl;
+            bool chapterResult = chapterOne(player);
+
+            if(chapterResult && player.isAlive()){
+                player.setChapterOneCompleted(true);
+                player.setCurrentChapter(2);
+                std::cout<< "Chapter 1 completed! Save game(y/n):" << std::endl;
+                char choice;
+                std::cin >> choice;
+                while (std::cin.fail()) {
+                    std::cout << "Invalid input. Please enter (y/n)." << std::endl;
+                    std::cin.clear(); // Clear the error flag
+                    std::cin.ignore(256, '\n'); // Discard the bad input
+                    std::cin >> choice; // Try again
+                }
+            
+                if (choice == 'y'|| choice == 'Y'){
+                    saveGame(player);
+                }
+                
+                std::cout<< "Continue to Chapter 2? (Y/N):" << std::endl;
+                char s;
+                std::cin >> s;
+                while (std::cin.fail()) {
+                    std::cout << "Invalid input. Please enter (y/n)." << std::endl;
+                    std::cin.clear(); // Clear the error flag
+                    std::cin.ignore(256, '\n'); // Discard the bad input
+                    std::cin >> s; // Try again
+                }
+            
+                if (s == 'y'|| s == 'Y'){
+                    chapterTwo(player);
+                }
+            
+            }
+            else{
+                std::cout << "Chapter 1 is not completed," <<std::endl;
+            }
+        }
+        else if(player.getCurrentChapter() == 2) {
+            
+            std::cout << "Resuming Chapter 2..." << std::endl;
+           
+            chapterTwo(player);    
+       }
+       else{
+            std::cout<< "Game completed! (For now... New chapters coming soon...)"<< std::endl;
+            bool running = false;
+       }
+    }
+    else{
+        std::cout << "Error: Couldn't load from"<< filename<<std::endl;
+    }
+}       
+
+
 int main(){
     srand(time(0));
-
+    Player player;
     bool running = true;
 
     while(running){
@@ -548,10 +683,10 @@ int main(){
 
         switch(choice){
             case 1:
-                startNewGame();
+                startNewGame(player);
                 break;
             case 2:
-                std::cout << "Load game is not implemented yet..." << std::endl;
+                loadGame(player);
                 break;
             case 3:
                 std::cout << "Thanks for Playing!" <<std::endl;
