@@ -13,4 +13,4 @@ This game was written entirely in C++ and was instrumental in helping me underst
 
 >> Plans for the Future
 
-I plan to create another, more advanced text-based game within the next three weeks. This next project will build upon the lessons learned here and demonstrate my continued improvement and commitment to my development goals.
+I plan to create another, more advanced text-based game in the next month. This next project will build upon the lessons learned here and demonstrate my continued improvement and commitment to my development goals.
